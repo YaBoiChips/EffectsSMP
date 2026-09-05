@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "effects",
+  "version": "${version}",
+  "name": "Effects",
+  "description": "A tech mod that adds power generation/machine processing using the power of pressurized fluids",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/effects/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "yaboichips.effects.client.EffectsClient"
+    ],
+    "main": [
+      "yaboichips.effects.Effects"
+    ]
+  },
+  "mixins": [
+    "effects.mixins.json",
+    {
+      "config": "effects.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

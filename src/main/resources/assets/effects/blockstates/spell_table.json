@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "effects:block/spell_table"
+    }
+  }
+}

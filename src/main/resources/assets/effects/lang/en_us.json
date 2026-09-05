@@ -1,0 +1,26 @@
+{
+  "itemgroup.effects.effects": "Effects",
+
+  //items
+  "item.effects.spell_table": "Spell Table",
+  "item.effects.amulet_of_willpower": "Amulet of Willpower",
+
+  //spells
+  "spell.effects.haste_spell": "Haste",
+  "spell.effects.haste_spell.description": "Grants the Haste effect while equipped.",
+  "spell.effects.haste_spell.upgrade.2": "Upgrades the effect from Haste I to Haste II.",
+  "spell.effects.leap_spell": "Leap",
+  "spell.effects.leap_spell.description": "Launches you forward in the direction you're looking.",
+  "spell.effects.leap_spell.upgrade.2": "Doubles the distance traveled by the leap.",
+  "spell.effects.leap_spell.upgrade.3": "Doubles the distance traveled by the leap again.",
+
+  //gui
+  "gui.effects.spell_table_title": "Spell Table",
+  "gui.effects.spell_points": "Spell Points: ",
+
+  //keybinds
+  "key.categories.effects.spells": "Effects Spells",
+  "key.effects.cast_level_1": "Cast Spell (Level 1)",
+  "key.effects.cast_level_2": "Cast Spell (Level 2)",
+  "key.effects.cast_level_3": "Cast Spell (Level 3)"
+}
