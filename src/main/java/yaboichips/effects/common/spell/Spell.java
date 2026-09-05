@@ -31,16 +31,10 @@ public abstract class Spell {
         return Component.translatable("spell." + id.getNamespace() + "." + id.getPath());
     }
 
-    /**
-     * Brief explanation of what the spell does, shown when hovering its equipped icon.
-     */
     public Component description() {
         return Component.translatable("spell." + id.getNamespace() + "." + id.getPath() + ".description");
     }
 
-    /**
-     * Explanation of what a specific upgrade level changes, shown when hovering that level's upgrade icon.
-     */
     public Component upgradeDescription(int level) {
         return Component.translatable("spell." + id.getNamespace() + "." + id.getPath() + ".upgrade." + level);
     }

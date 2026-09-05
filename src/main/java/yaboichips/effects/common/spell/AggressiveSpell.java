@@ -17,8 +17,6 @@ public abstract class AggressiveSpell extends Spell {
         return SpellType.AGGRESSIVE;
     }
 
-    /**
-     * Called once when the player presses the keybinding for this level.
-     */
+
     public abstract void activate(ServerPlayer player, int level);
 }

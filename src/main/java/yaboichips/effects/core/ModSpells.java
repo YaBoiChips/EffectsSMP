@@ -12,6 +12,7 @@ import yaboichips.effects.common.spell.PassiveSpell;
 import yaboichips.effects.common.spell.Spell;
 import yaboichips.effects.common.spell.aggressive.LeapSpell;
 import yaboichips.effects.common.spell.passive.HasteSpell;
+import yaboichips.effects.common.spell.passive.NaturalistSpell;
 
 public class ModSpells {
 
@@ -20,6 +21,9 @@ public class ModSpells {
 
     public static final PassiveSpell HASTE_SPELL = registerPassive("haste_spell",
             new HasteSpell(idOf("haste_spell"), iconOf("haste_spell")));
+
+    public static final PassiveSpell NATURALIST_SPELL = registerPassive("naturalist_spell",
+            new NaturalistSpell(idOf("naturalist_spell"), iconOf("naturalist_spell")));
 
     public static final AggressiveSpell LEAP_SPELL = registerAggressive("leap_spell",
             new LeapSpell(idOf("leap_spell"), iconOf("leap_spell")));

@@ -1,6 +1,7 @@
 package yaboichips.effects;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import yaboichips.effects.common.spell.PassiveSpell;
 import yaboichips.effects.core.ModAttachments;
 import yaboichips.effects.core.ModBlocks;
+import yaboichips.effects.core.ModCommands;
 import yaboichips.effects.core.ModItemGroups;
 import yaboichips.effects.core.ModItems;
 import yaboichips.effects.core.ModPayloads;
@@ -28,6 +30,7 @@ public class Effects implements ModInitializer {
         ModAttachments.registerAttachments();
         ModPayloads.registerPayloads();
         ModPayloads.registerServerReceivers();
+        ModCommands.registerCommands();
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -39,6 +42,19 @@ public class Effects implements ModInitializer {
                     }
                 });
             }
+        });
+
+        ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamageTaken, damageTaken, blocked) -> {
+            if (!(entity instanceof ServerPlayer player)) {
+                return;
+            }
+            var data = player.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+            data.equippedPassive().ifPresent(spellId -> {
+                int level = data.levelOf(spellId);
+                if (level > 0 && ModSpells.get(spellId) instanceof PassiveSpell passiveSpell) {
+                    passiveSpell.onDamaged(player, level, source, damageTaken);
+                }
+            });
         });
     }
 }

@@ -13,6 +13,15 @@
   "spell.effects.leap_spell.description": "Launches you forward in the direction you're looking.",
   "spell.effects.leap_spell.upgrade.2": "Doubles the distance traveled by the leap.",
   "spell.effects.leap_spell.upgrade.3": "Doubles the distance traveled by the leap again.",
+  "spell.effects.naturalist_spell": "Naturalist",
+  "spell.effects.naturalist_spell.description": "Gain Regeneration while standing in direct sunlight.",
+  "spell.effects.naturalist_spell.upgrade.2": "Taking damage has a 2.5% chance to release spores that heal you and nearby trusted allies.",
+
+  //commands
+  "commands.effects.trust.self": "You cannot trust yourself.",
+  "commands.effects.trust.success": "You now trust %s.",
+  "commands.effects.untrust.not_trusted": "You do not trust %s.",
+  "commands.effects.untrust.success": "You no longer trust %s.",
 
   //gui
   "gui.effects.spell_table_title": "Spell Table",
