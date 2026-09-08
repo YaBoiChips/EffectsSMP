@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "yaboichips.effects.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "NameTagVisibilityMixin",
+    "SoundSuppressionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

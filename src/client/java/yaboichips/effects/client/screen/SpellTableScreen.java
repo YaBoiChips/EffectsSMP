@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,13 +29,18 @@ public class SpellTableScreen extends Screen {
 
     private static final int LIST_ICON_SIZE = 40;
     private static final int LIST_ICON_NATIVE_SIZE = 64;
+    private static final int LIST_ITEM_GAP = 10;
+    private static final int LIST_VISIBLE_ITEMS = 4;
+    private static final int LIST_CONTAINER_HEIGHT = LIST_VISIBLE_ITEMS * LIST_ICON_SIZE + (LIST_VISIBLE_ITEMS - 1) * LIST_ITEM_GAP;
+    private static final int SCROLL_ARROW_GAP = 4;
+    private static final int SCROLL_ARROW_HEIGHT = 9;
     private static final int BOX_ICON_SIZE = 64;
     private static final int LEVEL_ICON_SIZE = 32;
     private static final int COLUMN_GAP = 20;
     private static final int BOX_WIDTH = 110;
     private static final int BOX_HEIGHT = 220;
     private static final int PANEL_WIDTH = COLUMN_GAP + LIST_ICON_SIZE + COLUMN_GAP + BOX_WIDTH + COLUMN_GAP + BOX_WIDTH + COLUMN_GAP + LIST_ICON_SIZE + COLUMN_GAP;
-    private static final int PANEL_HEIGHT = 280;
+    private static final int PANEL_HEIGHT = 290;
 
     private static final int PASSIVE_COLOR = 0xFFADD8E6;
     private static final int AGGRESSIVE_COLOR = 0xFF8B0000;
@@ -41,6 +48,13 @@ public class SpellTableScreen extends Screen {
 
     private final List<ClickZone> clickZones = new ArrayList<>();
     private final List<HoverZone> hoverZones = new ArrayList<>();
+
+    private int passiveScroll;
+    private int aggressiveScroll;
+    private int passiveListX;
+    private int passiveListY;
+    private int aggressiveListX;
+    private int aggressiveListY;
 
     public SpellTableScreen() {
         super(Component.translatable("gui.effects.spell_table_title"));
@@ -79,19 +93,23 @@ public class SpellTableScreen extends Screen {
         guiGraphics.drawString(this.font, pointsText, pointsX, pointsY, 0xFFFFD700);
 
         int x = panelLeft + COLUMN_GAP;
-        int listTop = panelTop + 40;
+        int listTop = panelTop + 48;
         int boxTop = panelTop + 32;
 
-        int passiveListX = x;
+        passiveListX = x;
+        passiveListY = listTop;
         x += LIST_ICON_SIZE + COLUMN_GAP;
         int passiveBoxX = x;
         x += BOX_WIDTH + COLUMN_GAP;
         int aggressiveBoxX = x;
         x += BOX_WIDTH + COLUMN_GAP;
-        int aggressiveListX = x;
+        aggressiveListX = x;
+        aggressiveListY = listTop;
 
-        renderSpellList(guiGraphics, passiveListX, listTop, ModSpells.passiveSpells(), data, data.equippedPassive(), PASSIVE_COLOR);
-        renderSpellList(guiGraphics, aggressiveListX, listTop, ModSpells.aggressiveSpells(), data, data.equippedAggressive(), AGGRESSIVE_COLOR);
+        renderSpellList(guiGraphics, passiveListX, listTop, ModSpells.passiveSpells(), data, data.equippedPassive(), PASSIVE_COLOR,
+                () -> passiveScroll, v -> passiveScroll = v);
+        renderSpellList(guiGraphics, aggressiveListX, listTop, ModSpells.aggressiveSpells(), data, data.equippedAggressive(), AGGRESSIVE_COLOR,
+                () -> aggressiveScroll, v -> aggressiveScroll = v);
 
         renderEquippedBox(guiGraphics, passiveBoxX, boxTop, data, data.equippedPassive(), 1, PASSIVE_COLOR);
         renderEquippedBox(guiGraphics, aggressiveBoxX, boxTop, data, data.equippedAggressive(), 2, AGGRESSIVE_COLOR);
@@ -105,14 +123,23 @@ public class SpellTableScreen extends Screen {
     }
 
     private void renderSpellList(GuiGraphics guiGraphics, int listX, int listY,
-                                  Collection<? extends Spell> spells, PlayerSpellData data,
-                                  Optional<Identifier> equippedId, int outlineColor) {
-        int count = Math.max(spells.size(), 1);
-        int totalHeight = count * LIST_ICON_SIZE + (count - 1) * 10;
-        drawBorder(guiGraphics, listX - 4, listY - 4, LIST_ICON_SIZE + 8, totalHeight + 8, outlineColor);
+                                  Collection<? extends Spell> spellCollection, PlayerSpellData data,
+                                  Optional<Identifier> equippedId, int outlineColor,
+                                  IntSupplier scrollGetter, IntConsumer scrollSetter) {
+        List<? extends Spell> spells = new ArrayList<>(spellCollection);
+        int total = spells.size();
+        int maxScroll = Math.max(0, total - LIST_VISIBLE_ITEMS);
+        int scroll = Math.max(0, Math.min(scrollGetter.getAsInt(), maxScroll));
+        scrollSetter.accept(scroll);
+
+        drawBorder(guiGraphics, listX - 4, listY - 4, LIST_ICON_SIZE + 8, LIST_CONTAINER_HEIGHT + 8, outlineColor);
+
+        guiGraphics.enableScissor(listX - 4, listY - 4, listX + LIST_ICON_SIZE + 4, listY + LIST_CONTAINER_HEIGHT + 4);
 
         int y = listY;
-        for (Spell spell : spells) {
+        int end = Math.min(total, scroll + LIST_VISIBLE_ITEMS);
+        for (int i = scroll; i < end; i++) {
+            Spell spell = spells.get(i);
             boolean unlocked = data.isUnlocked(spell.id());
             boolean equipped = equippedId.map(spell.id()::equals).orElse(false);
 
@@ -127,8 +154,10 @@ public class SpellTableScreen extends Screen {
             int zoneY = y;
             clickZones.add(new ClickZone(zoneX, zoneY, zoneX + LIST_ICON_SIZE, zoneY + LIST_ICON_SIZE, () -> {
                 if (!unlocked) {
-                    ClientPlayNetworking.send(new UnlockSpellPayload(spell.id()));
-                    playClickSound();
+                    if (data.spellPoints() >= 1) {
+                        ClientPlayNetworking.send(new UnlockSpellPayload(spell.id()));
+                        playClickSound();
+                    }
                 } else if (!equipped) {
                     ClientPlayNetworking.send(new EquipSpellPayload(spell.id()));
                     playClickSound();
@@ -136,7 +165,25 @@ public class SpellTableScreen extends Screen {
             }));
             hoverZones.add(new HoverZone(zoneX, zoneY, zoneX + LIST_ICON_SIZE, zoneY + LIST_ICON_SIZE, spell.name()));
 
-            y += LIST_ICON_SIZE + 10;
+            y += LIST_ICON_SIZE + LIST_ITEM_GAP;
+        }
+
+        guiGraphics.disableScissor();
+
+        if (total > LIST_VISIBLE_ITEMS) {
+            int arrowCenterX = listX + LIST_ICON_SIZE / 2;
+            if (scroll > 0) {
+                int upArrowY = listY - 4 - SCROLL_ARROW_GAP - SCROLL_ARROW_HEIGHT;
+                guiGraphics.drawCenteredString(this.font, "▲", arrowCenterX, upArrowY, 0xFFFFFFFF);
+                clickZones.add(new ClickZone(listX, upArrowY - 2, listX + LIST_ICON_SIZE, upArrowY + SCROLL_ARROW_HEIGHT + 2,
+                        () -> scrollSetter.accept(Math.max(0, scrollGetter.getAsInt() - 1))));
+            }
+            if (scroll < maxScroll) {
+                int downArrowY = listY + LIST_CONTAINER_HEIGHT + 4 + SCROLL_ARROW_GAP;
+                guiGraphics.drawCenteredString(this.font, "▼", arrowCenterX, downArrowY, 0xFFFFFFFF);
+                clickZones.add(new ClickZone(listX, downArrowY - 2, listX + LIST_ICON_SIZE, downArrowY + SCROLL_ARROW_HEIGHT + 2,
+                        () -> scrollSetter.accept(Math.min(maxScroll, scrollGetter.getAsInt() + 1))));
+            }
         }
     }
 
@@ -200,7 +247,11 @@ public class SpellTableScreen extends Screen {
     }
 
     private void drawIcon(GuiGraphics guiGraphics, Identifier texture, int x, int y, int drawSize, int nativeSize) {
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0f, 0f, drawSize, drawSize, nativeSize, nativeSize);
+        // dest size (drawSize) and source-sample size (nativeSize) must be passed
+        // separately here - the shorter 10-arg blit overload forces them to be
+        // the same value, which just crops to the top-left corner when they differ.
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0f, 0f,
+                drawSize, drawSize, nativeSize, nativeSize, nativeSize, nativeSize);
     }
 
     private void drawBorder(GuiGraphics guiGraphics, int x, int y, int w, int h, int color) {
@@ -223,6 +274,26 @@ public class SpellTableScreen extends Screen {
             }
         }
         return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (isOverList(mouseX, mouseY, passiveListX, passiveListY)) {
+            int maxScroll = Math.max(0, ModSpells.passiveSpells().size() - LIST_VISIBLE_ITEMS);
+            passiveScroll = Math.max(0, Math.min(passiveScroll - (int) Math.signum(scrollY), maxScroll));
+            return true;
+        }
+        if (isOverList(mouseX, mouseY, aggressiveListX, aggressiveListY)) {
+            int maxScroll = Math.max(0, ModSpells.aggressiveSpells().size() - LIST_VISIBLE_ITEMS);
+            aggressiveScroll = Math.max(0, Math.min(aggressiveScroll - (int) Math.signum(scrollY), maxScroll));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private boolean isOverList(double mouseX, double mouseY, int listX, int listY) {
+        return mouseX >= listX - 4 && mouseX < listX + LIST_ICON_SIZE + 4
+                && mouseY >= listY - 4 && mouseY < listY + LIST_CONTAINER_HEIGHT + 4;
     }
 
     private record ClickZone(int x1, int y1, int x2, int y2, Runnable action) {

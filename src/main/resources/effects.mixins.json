@@ -4,6 +4,10 @@
   "package": "yaboichips.effects.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ArrowHomingMixin",
+    "EnchantmentMenuMixin",
+    "GoldenAppleConsumeMixin",
+    "PlayerXpMixin"
   ],
   "injectors": {
     "defaultRequire": 1

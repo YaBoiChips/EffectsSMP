@@ -10,6 +10,7 @@ import yaboichips.effects.common.spell.Spell;
 import yaboichips.effects.network.ActivateAggressiveSpellPayload;
 import yaboichips.effects.network.EquipSpellPayload;
 import yaboichips.effects.network.OpenSpellTablePayload;
+import yaboichips.effects.network.SetDeafenedPayload;
 import yaboichips.effects.network.UnlockSpellPayload;
 import yaboichips.effects.network.UpgradeSpellPayload;
 
@@ -17,6 +18,7 @@ public class ModPayloads {
 
     public static void registerPayloads() {
         PayloadTypeRegistry.playS2C().register(OpenSpellTablePayload.TYPE, OpenSpellTablePayload.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(SetDeafenedPayload.TYPE, SetDeafenedPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(UnlockSpellPayload.TYPE, UnlockSpellPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(EquipSpellPayload.TYPE, EquipSpellPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(UpgradeSpellPayload.TYPE, UpgradeSpellPayload.STREAM_CODEC);
