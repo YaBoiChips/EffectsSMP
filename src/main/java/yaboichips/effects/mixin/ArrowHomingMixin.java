@@ -17,11 +17,6 @@ import net.minecraft.world.phys.Vec3;
 import yaboichips.effects.common.spell.SpellTargeting;
 import yaboichips.effects.core.ModSpells;
 
-/**
- * Archer Level 3's "aimbot" - there's no Fabric event for "steer this arrow",
- * so it's implemented the same way EnchanterSpell handles its own no-event
- * gaps: a mixin that checks the shooter's active spell state directly.
- */
 @Mixin(AbstractArrow.class)
 public abstract class ArrowHomingMixin {
 

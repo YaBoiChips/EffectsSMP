@@ -15,14 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import yaboichips.effects.core.ModAttachments;
 import yaboichips.effects.core.ModSpells;
 
-/**
- * Two independent, purely visual nametag conditions share this single
- * injection point: Stealth Level 1 hides its caster's nametag for every
- * viewer, and Watcher Level 1 reveals invisible players' nametags for the
- * local viewer only (both read state each client already has - Stealth via
- * the all-client-synced {@link ModAttachments#STEALTH_ACTIVE}, Watcher via
- * the local player's own {@link ModAttachments#SPELL_DATA}).
- */
 @Mixin(LivingEntityRenderer.class)
 public abstract class NameTagVisibilityMixin {
 

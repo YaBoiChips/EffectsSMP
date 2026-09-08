@@ -12,12 +12,6 @@ import net.minecraft.sounds.SoundSource;
 
 import yaboichips.effects.client.core.DeafenState;
 
-/**
- * Approximates Stealth's Smokescreen "deafness" by dropping non-UI sounds
- * locally while {@link DeafenState#isDeafened()} - there's no vanilla
- * deafness effect to hook into, and this doesn't touch the player's actual
- * volume settings.
- */
 @Mixin(SoundManager.class)
 public abstract class SoundSuppressionMixin {
 
