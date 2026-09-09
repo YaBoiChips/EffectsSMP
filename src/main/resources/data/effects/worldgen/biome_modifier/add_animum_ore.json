@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:add_feature",
+  "biomes": ["minecraft:dripstone_cave"],
+  "features": ["effects:animum_ore"],
+  "step": "underground_ores"
+}

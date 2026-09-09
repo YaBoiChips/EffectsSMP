@@ -21,6 +21,9 @@ public class ModItems {
 
     public static final Item WITHERING_BLADE = registerItem("withering_blade", Item::new, new Item.Properties().sword(ToolMaterial.COPPER,6.0f,-2.4f));
 
+    public static final Item RAW_ANIMUM = registerItem("raw_animum", Item::new, new Item.Properties());
+    public static final Item ANIMUM_INGOT = registerItem("animum_ingot", Item::new, new Item.Properties());
+
     public static Item registerItem(String name, Function<Item.Properties, Item> factory, Item.Properties properties) {
         ResourceKey<Item> itemKey = keyOf(name);
         Item item = factory.apply(properties.setId(itemKey));

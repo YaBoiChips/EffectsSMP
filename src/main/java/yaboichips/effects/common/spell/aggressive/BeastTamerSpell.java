@@ -208,6 +208,7 @@ public class BeastTamerSpell extends AggressiveSpell {
             brute.setPos(player.getX() + offsetX, player.getY(), player.getZ() + offsetZ);
             brute.addEffect(new MobEffectInstance(MobEffects.SPEED, BRUTE_LIFETIME_TICKS + 20, 1, false, false));
             brute.setImmuneToZombification(true);
+            brute.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.GOLDEN_AXE));
             level.addFreshEntity(brute);
             ids.add(brute.getUUID());
         }
