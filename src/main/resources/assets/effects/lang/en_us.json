@@ -5,10 +5,6 @@
   "item.effects.spell_table": "Spell Table",
   "item.effects.amulet_of_willpower": "Amulet of Willpower",
   "item.effects.withering_blade": "Withering Blade",
-  "item.effects.animum_ore": "Animum Ore",
-  "item.effects.deepslate_animum_ore": "Deepslate Animum Ore",
-  "item.effects.raw_animum": "Raw Animum",
-  "item.effects.animum_ingot": "Animum Ingot",
 
   //spells
   "spell.effects.haste_spell": "Haste",

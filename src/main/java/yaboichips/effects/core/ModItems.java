@@ -19,6 +19,8 @@ public class ModItems {
 
     public static final Item AMULET_OF_WILLPOWER = registerItem("amulet_of_willpower", AmuletOfWillpowerItem::new, new Item.Properties());
 
+    public static final Item Default_Book = registerItem("default_book", AmuletOfWillpowerItem::new, new Item.Properties());
+
     public static final Item WITHERING_BLADE = registerItem("withering_blade", Item::new, new Item.Properties().sword(ToolMaterial.COPPER,6.0f,-2.4f));
 
     public static final Item RAW_ANIMUM = registerItem("raw_animum", Item::new, new Item.Properties());
