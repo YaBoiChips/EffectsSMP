@@ -9,23 +9,27 @@ import java.util.function.IntSupplier;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-import yaboichips.effects.core.ModAttachments;
-import yaboichips.effects.core.ModSpells;
+import yaboichips.effects.common.menu.SpellTableMenu;
 import yaboichips.effects.common.spell.Spell;
-import yaboichips.effects.data.PlayerSpellData;
+import yaboichips.effects.core.ModAttachments;
+import yaboichips.effects.core.ModComponents;
+import yaboichips.effects.core.ModSpells;
+import yaboichips.effects.data.SpellBookData;
 import yaboichips.effects.network.EquipSpellPayload;
 import yaboichips.effects.network.UnlockSpellPayload;
 import yaboichips.effects.network.UpgradeSpellPayload;
 
-public class SpellTableScreen extends Screen {
+public class SpellTableScreen extends AbstractContainerScreen<SpellTableMenu> {
 
     private static final int LIST_ICON_SIZE = 40;
     private static final int LIST_ICON_NATIVE_SIZE = 64;
@@ -38,13 +42,12 @@ public class SpellTableScreen extends Screen {
     private static final int LEVEL_ICON_SIZE = 32;
     private static final int COLUMN_GAP = 20;
     private static final int BOX_WIDTH = 110;
-    private static final int BOX_HEIGHT = 220;
-    private static final int PANEL_WIDTH = COLUMN_GAP + LIST_ICON_SIZE + COLUMN_GAP + BOX_WIDTH + COLUMN_GAP + BOX_WIDTH + COLUMN_GAP + LIST_ICON_SIZE + COLUMN_GAP;
-    private static final int PANEL_HEIGHT = 290;
+    private static final int SLOT_SIZE = 18;
 
     private static final int PASSIVE_COLOR = 0xFFADD8E6;
     private static final int AGGRESSIVE_COLOR = 0xFF8B0000;
     private static final int EQUIPPED_HIGHLIGHT_COLOR = 0xFFFFD700;
+    private static final int SLOT_FRAME_COLOR = 0xFF555555;
 
     private final List<ClickZone> clickZones = new ArrayList<>();
     private final List<HoverZone> hoverZones = new ArrayList<>();
@@ -55,9 +58,27 @@ public class SpellTableScreen extends Screen {
     private int passiveListY;
     private int aggressiveListX;
     private int aggressiveListY;
+    private int spellPoints;
 
-    public SpellTableScreen() {
-        super(Component.translatable("gui.effects.spell_table_title"));
+    public SpellTableScreen(SpellTableMenu menu, Inventory playerInventory, Component title) {
+        super(menu, playerInventory, title);
+        this.imageWidth = SpellTableMenu.PANEL_WIDTH;
+        this.imageHeight = SpellTableMenu.PANEL_HEIGHT;
+        this.inventoryLabelX = SpellTableMenu.MAIN_INV_X;
+        this.inventoryLabelY = SpellTableMenu.MAIN_INV_Y - 12;
+    }
+
+    /**
+     * The base class's title/inventory label positions default to (0,0)
+     * unless a subclass sets them, which would draw both labels stacked on
+     * top of each other in the panel's top-left corner - and the title would
+     * duplicate the one already drawn in renderBg. Override outright instead
+     * of just repositioning: draw only the inventory label, in the gap left
+     * for it above the player inventory grid.
+     */
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
     }
 
     @Override
@@ -65,36 +86,45 @@ public class SpellTableScreen extends Screen {
         return false;
     }
 
+    private SpellBookData bookData() {
+        ItemStack book = this.menu.getBookSlot().getItem();
+        return book.getOrDefault(ModComponents.SPELL_BOOK_DATA, SpellBookData.DEFAULT);
+    }
+
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.fill(0, 0, this.width, this.height, 0x66000000);
-        clickZones.clear();
-        hoverZones.clear();
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        guiGraphics.fill(leftPos - 2, topPos - 2, leftPos + imageWidth + 2, topPos + imageHeight + 2, 0xFF000000);
+        guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, 0xFF2B2B2B);
 
-        LocalPlayer player = this.minecraft.player;
-        if (player == null) {
-            return;
+        guiGraphics.drawCenteredString(this.font, this.title, leftPos + imageWidth / 2, topPos + 10, 0xFFFFFFFF);
+
+        if (this.minecraft != null && this.minecraft.player != null) {
+            this.spellPoints = this.minecraft.player.getAttachedOrCreate(ModAttachments.SPELL_DATA).spellPoints();
         }
-        PlayerSpellData data = player.getAttachedOrCreate(ModAttachments.SPELL_DATA);
-
-        int panelLeft = (this.width - PANEL_WIDTH) / 2;
-        int panelTop = (this.height - PANEL_HEIGHT) / 2;
-
-        guiGraphics.fill(panelLeft - 2, panelTop - 2, panelLeft + PANEL_WIDTH + 2, panelTop + PANEL_HEIGHT + 2, 0xFF000000);
-        guiGraphics.fill(panelLeft, panelTop, panelLeft + PANEL_WIDTH, panelTop + PANEL_HEIGHT, 0xFF2B2B2B);
-
-        guiGraphics.drawCenteredString(this.font, this.title, panelLeft + PANEL_WIDTH / 2, panelTop + 10, 0xFFFFFFFF);
-
-        String pointsText = Component.translatable("gui.effects.spell_points").getString() + data.spellPoints();
+        String pointsText = Component.translatable("gui.effects.spell_points").getString() + spellPoints;
         int pointsTextWidth = this.font.width(pointsText);
-        int pointsX = panelLeft + PANEL_WIDTH - 12 - pointsTextWidth;
-        int pointsY = panelTop + 10;
+        int pointsX = leftPos + imageWidth - 12 - pointsTextWidth;
+        int pointsY = topPos + 10;
         guiGraphics.fill(pointsX - 4, pointsY - 3, pointsX + pointsTextWidth + 4, pointsY + 10, 0xAA000000);
         guiGraphics.drawString(this.font, pointsText, pointsX, pointsY, 0xFFFFD700);
 
-        int x = panelLeft + COLUMN_GAP;
-        int listTop = panelTop + 48;
-        int boxTop = panelTop + 32;
+        for (Slot slot : this.menu.slots) {
+            drawBorder(guiGraphics, leftPos + slot.x - 1, topPos + slot.y - 1, SLOT_SIZE, SLOT_SIZE, SLOT_FRAME_COLOR);
+        }
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        clickZones.clear();
+        hoverZones.clear();
+
+        SpellBookData data = bookData();
+
+        int x = leftPos + COLUMN_GAP;
+        int listTop = topPos + 48;
+        int boxTop = topPos + 32;
 
         passiveListX = x;
         passiveListY = listTop;
@@ -123,7 +153,7 @@ public class SpellTableScreen extends Screen {
     }
 
     private void renderSpellList(GuiGraphics guiGraphics, int listX, int listY,
-                                  Collection<? extends Spell> spellCollection, PlayerSpellData data,
+                                  Collection<? extends Spell> spellCollection, SpellBookData data,
                                   Optional<Identifier> equippedId, int outlineColor,
                                   IntSupplier scrollGetter, IntConsumer scrollSetter) {
         List<? extends Spell> spells = new ArrayList<>(spellCollection);
@@ -154,7 +184,7 @@ public class SpellTableScreen extends Screen {
             int zoneY = y;
             clickZones.add(new ClickZone(zoneX, zoneY, zoneX + LIST_ICON_SIZE, zoneY + LIST_ICON_SIZE, () -> {
                 if (!unlocked) {
-                    if (data.spellPoints() >= 1) {
+                    if (this.spellPoints >= 1) {
                         ClientPlayNetworking.send(new UnlockSpellPayload(spell.id()));
                         playClickSound();
                     }
@@ -188,9 +218,9 @@ public class SpellTableScreen extends Screen {
     }
 
     private void renderEquippedBox(GuiGraphics guiGraphics, int boxX, int boxY,
-                                    PlayerSpellData data, Optional<Identifier> equippedId, int upgradeLevels, int outlineColor) {
-        guiGraphics.fill(boxX, boxY, boxX + BOX_WIDTH, boxY + BOX_HEIGHT, 0xFF1A1A1A);
-        drawBorder(guiGraphics, boxX, boxY, BOX_WIDTH, BOX_HEIGHT, outlineColor);
+                                    SpellBookData data, Optional<Identifier> equippedId, int upgradeLevels, int outlineColor) {
+        guiGraphics.fill(boxX, boxY, boxX + BOX_WIDTH, boxY + 220, 0xFF1A1A1A);
+        drawBorder(guiGraphics, boxX, boxY, BOX_WIDTH, 220, outlineColor);
 
         if (equippedId.isEmpty()) {
             return;
@@ -203,7 +233,7 @@ public class SpellTableScreen extends Screen {
         int currentLevel = data.levelOf(spellId);
 
         int iconX = boxX + (BOX_WIDTH - BOX_ICON_SIZE) / 2;
-        int iconY = boxY + BOX_HEIGHT - BOX_ICON_SIZE - 14;
+        int iconY = boxY + 220 - BOX_ICON_SIZE - 14;
         drawIcon(guiGraphics, spell.icon(), iconX, iconY, BOX_ICON_SIZE, BOX_ICON_SIZE);
         drawBorder(guiGraphics, iconX, iconY, BOX_ICON_SIZE, BOX_ICON_SIZE, EQUIPPED_HIGHLIGHT_COLOR);
         hoverZones.add(new HoverZone(iconX, iconY, iconX + BOX_ICON_SIZE, iconY + BOX_ICON_SIZE, spell.description()));
@@ -216,7 +246,7 @@ public class SpellTableScreen extends Screen {
             }
             boolean reached = currentLevel >= targetLevel;
             boolean available = currentLevel == targetLevel - 1;
-            boolean affordable = data.spellPoints() >= 1;
+            boolean affordable = this.spellPoints >= 1;
 
             int arrowY = rungY - 18;
             guiGraphics.drawCenteredString(this.font, "▲", boxX + BOX_WIDTH / 2, arrowY, 0xFFFFFFFF);

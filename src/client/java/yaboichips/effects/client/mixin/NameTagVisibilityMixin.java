@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
+import yaboichips.effects.common.item.SpellBookItem;
 import yaboichips.effects.core.ModAttachments;
 import yaboichips.effects.core.ModSpells;
 
@@ -38,7 +39,7 @@ public abstract class NameTagVisibilityMixin {
         if (local == null || !local.isCrouching() || local.distanceToSqr(entity) > WATCHER_REVEAL_RANGE * WATCHER_REVEAL_RANGE) {
             return false;
         }
-        var data = local.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+        var data = SpellBookItem.getBoundBookData(local);
         return data.equippedPassive().filter(ModSpells.WATCHER_SPELL.id()::equals)
                 .map(data::levelOf).orElse(0) >= 1;
     }

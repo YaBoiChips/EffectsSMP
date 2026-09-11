@@ -11,8 +11,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
+import yaboichips.effects.common.item.SpellBookItem;
 import yaboichips.effects.common.spell.PassiveSpell;
-import yaboichips.effects.core.ModAttachments;
 
 public class HermitSpell extends PassiveSpell {
 
@@ -40,7 +40,7 @@ public class HermitSpell extends PassiveSpell {
     }
 
     private boolean isEquipped(ServerPlayer player) {
-        var data = player.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+        var data = SpellBookItem.getBoundBookData(player);
         return data.equippedPassive().filter(id()::equals).isPresent();
     }
 

@@ -4,8 +4,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
+import yaboichips.effects.common.item.SpellBookItem;
 import yaboichips.effects.common.spell.PassiveSpell;
-import yaboichips.effects.core.ModAttachments;
 
 /**
  * Both levels of this spell are implemented via mixins ({@code PlayerXpMixin}
@@ -27,7 +27,7 @@ public class EnchanterSpell extends PassiveSpell {
     }
 
     public boolean isEquippedAtLevel(Player player, int requiredLevel) {
-        var data = player.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+        var data = SpellBookItem.getBoundBookData(player);
         return data.equippedPassive()
                 .filter(id()::equals)
                 .map(data::levelOf)

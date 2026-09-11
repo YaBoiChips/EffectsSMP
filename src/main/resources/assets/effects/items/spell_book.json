@@ -1,0 +1,124 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "effects:item/spell_book_base"
+      },
+      {
+        "type": "minecraft:select",
+        "property": "minecraft:custom_model_data",
+        "index": 0,
+        "cases": [
+          {
+            "when": "effects:naturalist_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_passive_naturalist_spell"
+            }
+          },
+          {
+            "when": "effects:lightning_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_passive_lightning_spell"
+            }
+          },
+          {
+            "when": "effects:lavabender_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_passive_lavabender_spell"
+            }
+          },
+          {
+            "when": "effects:enchanter_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_passive_enchanter_spell"
+            }
+          },
+          {
+            "when": "effects:hermit_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_passive_hermit_spell"
+            }
+          },
+          {
+            "when": "effects:fortune_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_passive_fortune_spell"
+            }
+          },
+          {
+            "when": "effects:watcher_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_passive_watcher_spell"
+            }
+          }
+        ],
+        "fallback": {
+          "type": "minecraft:model",
+          "model": "effects:item/spell_book_passive_default"
+        }
+      },
+      {
+        "type": "minecraft:select",
+        "property": "minecraft:custom_model_data",
+        "index": 1,
+        "cases": [
+          {
+            "when": "effects:leap_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_aggressive_leap_spell"
+            }
+          },
+          {
+            "when": "effects:metallurgy_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_aggressive_metallurgy_spell"
+            }
+          },
+          {
+            "when": "effects:stealth_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_aggressive_stealth_spell"
+            }
+          },
+          {
+            "when": "effects:chorus_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_aggressive_chorus_spell"
+            }
+          },
+          {
+            "when": "effects:beast_tamer_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_aggressive_beast_tamer_spell"
+            }
+          },
+          {
+            "when": "effects:archer_spell",
+            "model": {
+              "type": "minecraft:model",
+              "model": "effects:item/spell_book_aggressive_archer_spell"
+            }
+          }
+        ],
+        "fallback": {
+          "type": "minecraft:model",
+          "model": "effects:item/spell_book_aggressive_default"
+        }
+      }
+    ]
+  }
+}

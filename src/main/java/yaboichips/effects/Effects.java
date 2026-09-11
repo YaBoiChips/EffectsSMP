@@ -14,15 +14,18 @@ import net.minecraft.world.entity.LivingEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import yaboichips.effects.common.item.SpellBookItem;
 import yaboichips.effects.common.spell.Spell;
 import yaboichips.effects.core.ModAttachments;
 import yaboichips.effects.core.ModBlocks;
 import yaboichips.effects.core.ModCommands;
+import yaboichips.effects.core.ModComponents;
 import yaboichips.effects.core.ModItemGroups;
 import yaboichips.effects.core.ModItems;
+import yaboichips.effects.core.ModMenus;
 import yaboichips.effects.core.ModPayloads;
 import yaboichips.effects.core.ModSpells;
-import yaboichips.effects.data.PlayerSpellData;
+import yaboichips.effects.data.SpellBookData;
 
 public class Effects implements ModInitializer {
 
@@ -36,13 +39,15 @@ public class Effects implements ModInitializer {
         ModItemGroups.registerItemGroups();
         ModSpells.registerModSpells();
         ModAttachments.registerAttachments();
+        ModComponents.registerModComponents();
+        ModMenus.registerModMenus();
         ModPayloads.registerPayloads();
         ModPayloads.registerServerReceivers();
         ModCommands.registerCommands();
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                var data = player.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+                var data = SpellBookItem.getBoundBookData(player);
                 tickEquipped(player, data, data.equippedPassive());
                 tickEquipped(player, data, data.equippedAggressive());
             }
@@ -50,13 +55,13 @@ public class Effects implements ModInitializer {
 
         ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamageTaken, damageTaken, blocked) -> {
             if (entity instanceof ServerPlayer victim) {
-                var data = victim.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+                var data = SpellBookItem.getBoundBookData(victim);
                 notifyDamaged(victim, data, data.equippedPassive(), source, damageTaken);
                 notifyDamaged(victim, data, data.equippedAggressive(), source, damageTaken);
             }
 
             if (source.getEntity() instanceof ServerPlayer attacker) {
-                var data = attacker.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+                var data = SpellBookItem.getBoundBookData(attacker);
                 notifyDealtDamage(attacker, data, data.equippedPassive(), entity, source, damageTaken);
                 notifyDealtDamage(attacker, data, data.equippedAggressive(), entity, source, damageTaken);
             }
@@ -67,14 +72,14 @@ public class Effects implements ModInitializer {
                 return true;
             }
 
-            var victimData = victim.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+            var victimData = SpellBookItem.getBoundBookData(victim);
             if (modifyIncoming(victim, victimData, victimData.equippedPassive(), source, amount)
                     || modifyIncoming(victim, victimData, victimData.equippedAggressive(), source, amount)) {
                 return false;
             }
 
             if (source.getEntity() instanceof ServerPlayer attacker) {
-                var attackerData = attacker.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+                var attackerData = SpellBookItem.getBoundBookData(attacker);
                 if (modifyOutgoing(attacker, attackerData, attackerData.equippedPassive(), victim, source, amount)
                         || modifyOutgoing(attacker, attackerData, attackerData.equippedAggressive(), victim, source, amount)) {
                     return false;
@@ -88,7 +93,7 @@ public class Effects implements ModInitializer {
             if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer) || !player.isShiftKeyDown()) {
                 return InteractionResult.PASS;
             }
-            var data = serverPlayer.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+            var data = SpellBookItem.getBoundBookData(serverPlayer);
             boolean hasBeastTamer = data.equippedAggressive().filter(ModSpells.BEAST_TAMER_SPELL.id()::equals)
                     .map(data::levelOf).orElse(0) >= 1;
             if (!hasBeastTamer) {
@@ -98,7 +103,7 @@ public class Effects implements ModInitializer {
         });
     }
 
-    private void tickEquipped(ServerPlayer player, PlayerSpellData data, Optional<Identifier> equipped) {
+    private void tickEquipped(ServerPlayer player, SpellBookData data, Optional<Identifier> equipped) {
         equipped.ifPresent(spellId -> {
             int level = data.levelOf(spellId);
             Spell spell = ModSpells.get(spellId);
@@ -108,7 +113,7 @@ public class Effects implements ModInitializer {
         });
     }
 
-    private void notifyDamaged(ServerPlayer player, PlayerSpellData data, Optional<Identifier> equipped,
+    private void notifyDamaged(ServerPlayer player, SpellBookData data, Optional<Identifier> equipped,
                                 DamageSource source, float damageTaken) {
         equipped.ifPresent(spellId -> {
             int level = data.levelOf(spellId);
@@ -119,7 +124,7 @@ public class Effects implements ModInitializer {
         });
     }
 
-    private void notifyDealtDamage(ServerPlayer attacker, PlayerSpellData data, Optional<Identifier> equipped,
+    private void notifyDealtDamage(ServerPlayer attacker, SpellBookData data, Optional<Identifier> equipped,
                                     LivingEntity target, DamageSource source, float damageDealt) {
         equipped.ifPresent(spellId -> {
             int level = data.levelOf(spellId);
@@ -130,7 +135,7 @@ public class Effects implements ModInitializer {
         });
     }
 
-    private boolean modifyIncoming(ServerPlayer player, PlayerSpellData data, Optional<Identifier> equipped,
+    private boolean modifyIncoming(ServerPlayer player, SpellBookData data, Optional<Identifier> equipped,
                                     DamageSource source, float amount) {
         if (equipped.isEmpty()) {
             return false;
@@ -141,7 +146,7 @@ public class Effects implements ModInitializer {
         return level > 0 && spell != null && spell.modifyIncomingDamage(player, level, source, amount);
     }
 
-    private boolean modifyOutgoing(ServerPlayer attacker, PlayerSpellData data, Optional<Identifier> equipped,
+    private boolean modifyOutgoing(ServerPlayer attacker, SpellBookData data, Optional<Identifier> equipped,
                                     ServerPlayer victim, DamageSource source, float amount) {
         if (equipped.isEmpty()) {
             return false;

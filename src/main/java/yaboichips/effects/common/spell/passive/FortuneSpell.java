@@ -7,8 +7,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
+import yaboichips.effects.common.item.SpellBookItem;
 import yaboichips.effects.common.spell.PassiveSpell;
-import yaboichips.effects.core.ModAttachments;
 
 /**
  * Level 1's golden apple bonus is implemented via a mixin
@@ -40,7 +40,7 @@ public class FortuneSpell extends PassiveSpell {
     }
 
     public boolean isEquippedAtLevel(Player player, int requiredLevel) {
-        var data = player.getAttachedOrCreate(ModAttachments.SPELL_DATA);
+        var data = SpellBookItem.getBoundBookData(player);
         return data.equippedPassive()
                 .filter(id()::equals)
                 .map(data::levelOf)
