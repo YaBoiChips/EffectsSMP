@@ -6,8 +6,8 @@
 		128
 	],
 	"textures": {
-		"0": "effects:item/spell_table",
-		"particle": "effects:item/spell_table"
+		"0": "effects:block/spell_table",
+		"particle": "effects:block/spell_table"
 	},
 	"elements": [
 		{

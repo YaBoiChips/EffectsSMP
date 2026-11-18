@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "effects:block/spell_table"
+    },
+    "facing=east": {
+      "model": "effects:block/spell_table",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "effects:block/spell_table",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "effects:block/spell_table",
+      "y": 270
     }
   }
 }
