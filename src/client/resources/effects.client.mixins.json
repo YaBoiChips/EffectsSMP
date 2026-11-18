@@ -4,6 +4,7 @@
   "package": "yaboichips.effects.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "BlurringEffectMixin",
     "NameTagVisibilityMixin",
     "SoundSuppressionMixin"
   ],

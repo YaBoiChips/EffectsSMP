@@ -26,14 +26,31 @@ public class SpellTableMenu extends AbstractContainerMenu {
      * Panel geometry shared with SpellTableScreen's hand-drawn layout. The
      * menu (common, server-visible) can't depend on the client-only screen
      * class, so both sides hardcode these same numbers - keep them in sync.
+     *
+     * The panel is the open-book art (book_background.png: a 384x240 canvas of
+     * which 298x213 is opaque) plus 3px each side that the plate under the book
+     * spans, with the player inventory laid over the book's lower edge on that
+     * plate. The spell tabs and the equipped-spell boxes all sit on the book's
+     * pages; the book slot sits on the spine, in the 20px gap between the two
+     * boxes.
+     *
+     * Everything that matters has to fit in 320x240: that's the scaled
+     * resolution Minecraft always guarantees regardless of the player's GUI
+     * Scale setting (Window.calculateScale never lets guiScaledWidth/Height
+     * drop below it), so anything past that can clip or render off-screen at
+     * high GUI Scale no matter how large the player's actual display is. The
+     * panel is 304 wide and 248 tall, so on a 240-high screen its top and
+     * bottom 4px are clipped. At the top that is only the book's ragged edge.
+     * At the bottom it is the plate's lower border and the last 2px of the
+     * hotbar's slot frames; the items themselves stay fully visible.
      */
-    public static final int PANEL_WIDTH = 400;
-    public static final int BOOK_SLOT_X = 191;
-    public static final int BOOK_SLOT_Y = 300;
-    public static final int MAIN_INV_X = 119;
-    public static final int MAIN_INV_Y = 348;
-    public static final int HOTBAR_Y = 406;
-    public static final int PANEL_HEIGHT = 434;
+    public static final int PANEL_WIDTH = 304;
+    public static final int BOOK_SLOT_X = 144;
+    public static final int BOOK_SLOT_Y = 76;
+    public static final int MAIN_INV_X = 72;
+    public static final int MAIN_INV_Y = 170;
+    public static final int HOTBAR_Y = 228;
+    public static final int PANEL_HEIGHT = 248;
 
     private final Container bookContainer = new SimpleContainer(1);
     private final Slot bookSlot;

@@ -7,6 +7,26 @@
   "item.effects.spell_book": "Spell Book",
   "item.effects.withering_blade": "Withering Blade",
 
+  //potion effects
+  "effect.effects.blurring": "Blurring",
+  "effect.effects.randomize": "Randomize",
+  "effect.effects.spring": "Spring",
+  "effect.effects.numbness": "Numbness",
+
+  //potions
+  "item.minecraft.potion.effect.blurring": "Potion of Blurring",
+  "item.minecraft.splash_potion.effect.blurring": "Splash Potion of Blurring",
+  "item.minecraft.lingering_potion.effect.blurring": "Lingering Potion of Blurring",
+  "item.minecraft.potion.effect.randomize": "Potion of Randomization",
+  "item.minecraft.splash_potion.effect.randomize": "Splash Potion of Randomization",
+  "item.minecraft.lingering_potion.effect.randomize": "Lingering Potion of Randomization",
+  "item.minecraft.potion.effect.spring": "Potion of Spring",
+  "item.minecraft.splash_potion.effect.spring": "Splash Potion of Spring",
+  "item.minecraft.lingering_potion.effect.spring": "Lingering Potion of Spring",
+  "item.minecraft.potion.effect.numbness": "Potion of Numbness",
+  "item.minecraft.splash_potion.effect.numbness": "Splash Potion of Numbness",
+  "item.minecraft.lingering_potion.effect.numbness": "Lingering Potion of Numbness",
+
   //spells
   "spell.effects.haste_spell": "Haste",
   "spell.effects.haste_spell.description": "Grants the Haste effect while equipped.",

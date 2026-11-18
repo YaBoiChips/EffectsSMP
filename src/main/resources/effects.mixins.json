@@ -7,7 +7,9 @@
     "ArrowHomingMixin",
     "EnchantmentMenuMixin",
     "GoldenAppleConsumeMixin",
-    "PlayerXpMixin"
+    "NumbnessEffectMixin",
+    "PlayerXpMixin",
+    "PotionBrewingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

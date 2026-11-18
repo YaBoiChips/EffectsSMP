@@ -10,10 +10,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import yaboichips.effects.common.effect.NumbnessMobEffect;
 import yaboichips.effects.common.item.SpellBookItem;
 import yaboichips.effects.common.spell.Spell;
 import yaboichips.effects.core.ModAttachments;
@@ -23,7 +25,9 @@ import yaboichips.effects.core.ModComponents;
 import yaboichips.effects.core.ModItemGroups;
 import yaboichips.effects.core.ModItems;
 import yaboichips.effects.core.ModMenus;
+import yaboichips.effects.core.ModMobEffects;
 import yaboichips.effects.core.ModPayloads;
+import yaboichips.effects.core.ModPotions;
 import yaboichips.effects.core.ModSpells;
 import yaboichips.effects.data.SpellBookData;
 
@@ -40,6 +44,8 @@ public class Effects implements ModInitializer {
         ModSpells.registerModSpells();
         ModAttachments.registerAttachments();
         ModComponents.registerModComponents();
+        ModMobEffects.registerModMobEffects();
+        ModPotions.registerModPotions();
         ModMenus.registerModMenus();
         ModPayloads.registerPayloads();
         ModPayloads.registerServerReceivers();
@@ -70,6 +76,15 @@ public class Effects implements ModInitializer {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (!(entity instanceof ServerPlayer victim)) {
                 return true;
+            }
+
+            if (source.is(DamageTypes.FALL) && victim.hasEffect(ModMobEffects.SPRING)) {
+                return false;
+            }
+
+            if (victim.hasEffect(ModMobEffects.NUMBNESS)) {
+                NumbnessMobEffect.bank(victim.getUUID(), amount);
+                return false;
             }
 
             var victimData = SpellBookItem.getBoundBookData(victim);
