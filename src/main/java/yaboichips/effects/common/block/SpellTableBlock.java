@@ -36,16 +36,16 @@ public class SpellTableBlock extends HorizontalDirectionalBlock {
 
     private static final VoxelShape NORTH_SHAPE = Shapes.or(
             // Cabinet base (outer shell of the model)
-            Block.box(-0.32, 0.0, -1.36, 17.36, 15.2, 16.32),
+            Block.box(-0.87, 0.0, -0.86, 16.81, 15.2, 16.82),
             // Back panel
-            Block.box(0.0, 15.0, 13.0, 17.0, 20.0, 16.0),
+            Block.box(-0.55, 15.0, 13.5, 16.45, 20.0, 16.5),
             // Stand and tilted book (the pillar sits inside the book's bounds)
-            Block.box(4.0, 15.0, 1.0, 13.0, 16.0, 10.0),
-            Block.box(2.95, 16.0, 0.76, 14.06, 21.14, 10.28),
+            Block.box(3.45, 15.0, 1.5, 12.45, 16.0, 10.5),
+            Block.box(2.4, 16.0, 1.26, 13.51, 21.14, 10.78),
             // Rotated decoration on the back panel, left half
-            Block.box(-0.28, 19.25, 11.25, 7.07, 25.56, 18.76),
+            Block.box(-0.83, 19.25, 11.75, 6.52, 25.56, 19.26),
             // Rotated decoration on the back panel, right half
-            Block.box(8.91, 20.0, 12.59, 17.15, 27.0, 16.83)
+            Block.box(8.36, 20.0, 13.09, 16.6, 27.0, 17.33)
     );
 
     private static final Map<Direction, VoxelShape> SHAPES = Shapes.rotateHorizontal(NORTH_SHAPE);

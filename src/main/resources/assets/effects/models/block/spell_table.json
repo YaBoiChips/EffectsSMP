@@ -7,7 +7,7 @@
 	],
 	"textures": {
 		"0": "effects:block/spell_table",
-		"particle": "effects:block/spell_table"
+		"particle": "minecraft:block/purple_wool"
 	},
 	"elements": [
 		{
